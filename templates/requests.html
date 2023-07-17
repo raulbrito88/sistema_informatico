@@ -1,0 +1,75 @@
+<!-- requests.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solicitudes y Requerimientos</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://static.wixstatic.com/media/5e7e60_308ee65618ac48a6a2353201077841c3~mv2.png/v1/fill/w_145,h_173,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/GRANLOGO_3.png" alt="Logo">
+        </div>
+        <h5>Bienvenido(a), {{ username }}!</h5>
+        <h1>Solicitudes y Requerimientos de Usuarios</h1>
+        <br>
+        <!-- formulario de solicitudes y los datos de las solicitudes -->
+        <form action="/save_request" method="post">
+            
+            <label class="label" for="title">Título:</label><br>
+            <input type="text" name="title" id="title" required><br>
+            
+            <label class="label" for="description">Descripción de la solicitud y/o requerimiento:</label>
+            <textarea name="description" id="description" class="expandable-textarea" rows="4" required></textarea>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-md-6">
+                  <label class="label" for="state">Estado:</label>
+                  <select name="state" id="state" class="select-field" required>
+                    {% for state in states %}
+                    <option value="{{ state }}">{{ state }}</option>
+                    {% endfor %}
+                  </select><br>
+                </div>
+              
+                <div class="col-md-6">
+                  <label class="label" for="service">Servicio:</label>
+                  <select name="service" id="service" class="select-field" required>
+                    {% for service in services %}
+                    <option value="{{ service }}">{{ service }}</option>
+                    {% endfor %}
+                  </select><br>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="label" for="priority">Prioridad:</label>
+                  <select name="priority" id="priority" class="select-field" required>
+                    {% for priority in priorities %}
+                    <option value="{{ priority }}">{{ priority }}</option>
+                    {% endfor %}
+                  </select><br>
+                </div>
+              
+                <div class="col-md-6">
+                    <label class="label" for="user">Usuario que solicita:</label>
+                    <select name="user" id="user" class="select-field" required>
+                      {% for user in users %}
+                      <option value="{{ user }}">{{ user }}</option>
+                      {% endfor %}
+                    </select><br>
+                </div>
+              </div>
+
+            <br>
+            <button class="button" type="submit">Guardar</button>
+        </form>
+    </div>
+</body>
+</html>
