@@ -1,0 +1,127 @@
+/* styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  
+  .container {
+    max-width: 445px;
+    padding: 48px;
+    background-color: rgba(180, 172, 97, 0.97);
+    border-radius: 22px;
+    box-shadow: 0 2px 5px rgb(0 0 0 / 12%);
+    position: relative;
+    text-align: center;
+  }
+  
+  .logo {
+    margin-bottom: 20px;
+}
+
+.logo img {
+    display: block;
+    margin: 0 auto;
+    max-width: 200px; /* Ajusta el ancho máximo deseado */
+    max-height: 100px; /* Ajusta la altura máxima deseada */
+}
+
+  h1 {
+    color: #333;
+    text-align: center;
+  }
+  
+  form {
+    margin-bottom: 20px;
+  }
+  
+/* Estilo para los campos desplegables */
+.select-field {
+  margin-bottom: 10px;
+  padding: 5px;
+  border-radius: 5px; /* Radio de las esquinas */
+}
+
+  /* Estilo para las etiquetas de los campos */
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    border-radius: 5px; /* Radio de las esquinas */
+  }
+  
+  input[type="text"],
+  input[type="password"] {
+    width: 95%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 5px; /* Radio de las esquinas */
+  }
+  
+  input[type="submit"] {
+    width: 99%;
+    padding: 10px 5px;
+    background-color: rgb(154,0,0);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px; /* Radio de las esquinas */
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  li {
+    margin-bottom: 5px;
+  }
+  
+  .dashboard-button {
+    background-color: rgb(154,0,0); /* Color de fondo */
+    border: none; /* Sin borde */
+    color: white; /* Color de texto */
+    padding: 11px 32px; /* Espaciado interno */
+    text-align: center; /* Alineación del texto */
+    text-decoration: none; /* Sin decoración de texto */
+    display: inline-block; /* Mostrar como bloque en línea */
+    font-size: 16px; /* Tamaño de fuente */
+    margin: 13px; /* Margen exterior */
+    cursor: pointer; /* Cambiar el cursor al pasar el mouse */
+    border-radius: 5px; /* Radio de las esquinas */
+    font-weight: bold;
+}
+
+.dashboard-button:hover {
+    background-color: rgb(155, 73, 73); /* Cambiar color de fondo al pasar el mouse */
+}
+
+#calendar {
+  margin-top: 20px;
+}
+
+/* Estilo para los botones */
+.button {
+  background-color: rgb(154,0,0);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: rgb(155, 73, 73);
+}
+
+.expandable-textarea {
+  resize: vertical;
+  width: 95%; /* Ajusta el ancho según tus preferencias */
+  box-sizing: border-box;
+  border-radius: 5px;
+}
