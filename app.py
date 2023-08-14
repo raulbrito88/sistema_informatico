@@ -1,33 +1,10 @@
-import os
+import hashlib
+from flask import Flask, render_template, request, redirect, session, make_response
 import hashlib
 import sqlite3
-import bcrypt
-from flask import Flask, render_template, request, redirect, session, make_response
-from flask_sqlalchemy import SQLAlchemy
-from config import Config
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
-from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY')  # Obtenga la clave secreta de las variables de entorno
-db_path = os.path.join(os.path.dirname(__file__), 'sistema.db')
-db_uri = 'sqlite:///{}'.format(db_path)
-app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-db = SQLAlchemy(app)
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-
-@login_manager.user_loader
-def load_user(user_id):
-    return db.session.get(User, int(user_id))
+app.secret_key = 'Meromero88*'  # Cambia esto a una clave secreta fuerte
 
 @app.route('/')
 def home():
@@ -38,33 +15,62 @@ def home():
 def register():
     if request.method == 'POST':
         username = request.form['username']
-        password = generate_password_hash(request.form['password'])
-        new_user = User(username=username, password=password) # type: ignore
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            return redirect('/login')
-        except SQLAlchemyError:
-            db.session.rollback()
-            return "Error al registrar el usuario"
-    return render_template('register.html')
+        password = request.form['password']
+
+        conn = sqlite3.connect('sistema.db')
+        cursor = conn.cursor()
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)",
+                       (username, hashed_password))
+        conn.commit()
+        conn.close()
+
+        return redirect('/login')
+
+    # Desactivar la caché
+    response = make_response(render_template('register.html'))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    return response
 
 # Ruta de inicio de sesión
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = User.query.filter_by(username=request.form['username']).first()
-        if user and check_password_hash(user.password, request.form['password']):
-            login_user(user)
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = sqlite3.connect('sistema.db')
+        cursor = conn.cursor()
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?",
+                       (username, hashed_password))
+        user = cursor.fetchone()
+        conn.close()
+
+        if user:
+            session['username'] = user[1]
             return redirect('/dashboard')
         else:
-            return "Usuario o contraseña inválidos"
-    return render_template('login.html')
+            error_message = "¡Usuario o contraseña inválidos!"  # Mensaje de error
+            return render_template('login.html', error_message=error_message)
+
+    # Desactivar la caché
+    response = make_response(render_template('login.html'))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    return response
 
 @app.route('/dashboard')
-@login_required
 def dashboard():
-    return render_template('dashboard.html')
+    username = session.get('username')
+    conn = sqlite3.connect('sistema.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM passwords")
+    passwords = cursor.fetchall()
+    cursor.execute("SELECT * FROM passwords WHERE site LIKE ? OR username LIKE ?",
+                   ('%%', '%%'))
+    search_results = cursor.fetchall()
+    conn.close()
+    return render_template('dashboard.html', username=username, passwords=passwords, search_results=search_results)
 
 # Mostrar el nombre de usuario con sesión abierta
 @app.route('/passwords')
@@ -81,15 +87,14 @@ def passwords():
     return render_template('passwords.html', username=username, passwords=passwords, search_results=search_results)
 
 # Ruta de cierre de sesión
-@app.route('/logout')
-@login_required
+@app.route('/logout', methods=['POST'])
 def logout():
-    logout_user()
+    session.pop('username', None)
     return redirect('/login')
 
 # Verificar la autenticación en todas las rutas
 @app.before_request
-def require_login(): # type: ignore
+def require_login():
     allowed_routes = ['login', 'register', '/', '/home']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
@@ -119,7 +124,7 @@ def search():
     conn = sqlite3.connect('sistema.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM passwords WHERE site LIKE ? OR username LIKE ?",
-                   ('%'+query+'%', '%'+query+'%')) # type: ignore
+                   ('%'+query+'%', '%'+query+'%'))
     search_results = cursor.fetchall()
     conn.close()
 
